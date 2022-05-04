@@ -1,0 +1,7 @@
+﻿  Main.cpp
+C:\GLP\mathforprogrammingchallengeassignmentweek5\Main.cpp(73,85): warning C4244: 'argument': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  mathforprogrammingchallengeassignmentweek5.vcxproj -> C:\GLP\mathforprogrammingchallengeassignmentweek5\Debug\mathforprogrammingchallengeassignmentweek5.exe

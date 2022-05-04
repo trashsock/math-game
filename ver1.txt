@@ -1,0 +1,163 @@
+//challenge assignment for math for programming- single player pong
+
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <random>
+#include <iostream>
+
+
+	//window dimensions
+const int winx = 800;
+const int winy = 800;
+int count = 0;	//counter to count how many times ball hits paddle
+
+//function to create random numbers
+float rnd()
+{
+	static std::random_device device;
+	static std::mt19937  gen(device());
+	static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+	return dist(gen);
+}
+
+float rnd(float low, float high)
+{
+	return rnd() * (high - low) + low;
+}
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode(winx, winy), "LET'S PLAY SOME PONG!!"); //window size
+
+		//ball components
+	float ballPosx = winx / 2.0f;
+	float ballPosy = winy / 2.0f;
+	float ballVelx = rnd(100.0f, 300.0f);	//giving ball random velocity
+	float ballVely = rnd(100.0f, 300.0f);
+	float ballRadius = 18.0f;	//radius of ball
+		//paddle components
+	float paddlePosx = 780.0f;
+	float paddlePosy = 400.0f;
+	float paddleVelx = 0.0f;
+	float paddleVely = 0.0f;
+	float paddleWidth = 8.3;	//width of paddle (x-component)
+	float paddleLength = 57.0f;	//length of paddle (y-component)
+
+
+		//paddle
+	sf::RectangleShape paddle;
+	paddle.setFillColor(sf::Color::Cyan);
+	paddle.setSize(sf::Vector2f(paddleWidth, paddleLength));
+
+	//ball
+	sf::CircleShape ball;
+	ball.setRadius(ballRadius);
+	ball.setFillColor(sf::Color::White);
+	ball.setOrigin(sf::Vector2f(ballRadius, ballRadius));
+
+	//font files
+/*sf::Font font;
+font.loadFromFile("arial.ttf");
+sf::Text text;
+text.setFont(font); */
+
+	window.setFramerateLimit(60);
+
+	float dt = 0;
+	sf::Clock clock;
+	clock.restart();
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+
+			//paddle only moves when UP or DOWN key is pressed
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
+				paddleVely = -250.0f;
+				paddleVelx = 0.0f;
+				paddlePosx += paddleVelx * dt;
+				paddlePosy += paddleVely * dt;
+				paddle.setPosition(paddlePosx, paddlePosy);
+				window.draw(paddle);
+			}
+
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				paddleVely = 250.0f;
+				paddleVelx = 0.0f;
+				paddlePosx += paddleVelx * dt;
+				paddlePosy += paddleVely * dt;
+				paddle.setPosition(paddlePosx, paddlePosy);
+				window.draw(paddle);
+			}
+
+			else
+			{
+				paddleVely = 0.0f;
+				paddleVelx = 0.0f;
+				paddlePosx += paddleVelx * dt;
+				paddlePosy += paddleVely * dt;
+				paddle.setPosition(paddlePosx, paddlePosy);
+				window.draw(paddle);
+			}
+		}
+
+		dt = clock.restart().asSeconds();
+		paddlePosx += paddleVelx * dt;
+		paddlePosy += paddleVely * dt;
+		ballPosx += ballVelx * dt;
+		ballPosy += ballVely * dt;
+
+		//ball collision with window
+		if (ballPosy > winy - ballRadius)
+		{
+			ballPosy = winy - ballRadius;
+			ballVely = -ballVely;
+		}
+
+		if (ballPosy < 0.0f + ballRadius)
+		{
+			ballPosy = 0.0f + ballRadius;
+			ballVely = -ballVely;
+		}
+
+		if (ballPosx < 0.0f + ballRadius)
+		{
+			ballPosx = 0.0f + ballRadius;
+			ballVelx = -ballVelx;
+		}
+
+		//ball collision with paddle length (front of paddle)
+		if (ball.getPosition() == paddle.getPosition())
+		{
+			//ballPosy -= paddleLength;
+			ballVely = -ballVely;
+		}
+
+
+		/*if (ballPosx > winx - ballRadius)		//clear screen function
+		{
+			window.clear();
+			text.setPosition(400.0f, 400.0f);
+			text.setString("you lose :( better luck next time");
+			text.setCharacterSize(24);
+			text.setFillColor(sf::Color::Red);
+			text.setStyle(sf::Text::Bold);
+			window.draw(text);
+			//window.display();
+		}*/
+
+		window.clear();
+		ball.setPosition(ballPosx, ballPosy);
+		paddle.setPosition(paddlePosx, paddlePosy);
+		window.draw(ball);
+		window.draw(paddle);
+		window.display();
+	}
+	return 0;
+}
